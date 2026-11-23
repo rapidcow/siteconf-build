@@ -1,7 +1,7 @@
 # siteconf-build
 
 [![Ubuntu](https://github.com/rapidcow/siteconf-build/actions/workflows/ubuntu.yml/badge.svg?branch=master)](https://github.com/rapidcow/siteconf-build/actions/workflows/ubuntu.yml?query=branch%3Amaster)
-[![macOS](https://github.com/rapidcow/siteconf-build/actions/workflows/macos.yml/badge.svg?branch=master)](https://github.com/rapidcow/siteconf-build/actions/workflows/macos.yml?query=branch%3Amaster)
+[![macOS (Intel)](https://github.com/rapidcow/siteconf-build/actions/workflows/macos.yml/badge.svg?branch=master)](https://github.com/rapidcow/siteconf-build/actions/workflows/macos.yml?query=branch%3Amaster)
 [![Alpine](https://github.com/rapidcow/siteconf-build/actions/workflows/alpine.yml/badge.svg?branch=master)](https://github.com/rapidcow/siteconf-build/actions/workflows/alpine.yml?query=branch%3Amaster)
 [![Arch Linux](https://github.com/rapidcow/siteconf-build/actions/workflows/arch.yml/badge.svg?branch=master)](https://github.com/rapidcow/siteconf-build/actions/workflows/arch.yml?query=branch%3Amaster)
 [![FreeBSD](https://github.com/rapidcow/siteconf-build/actions/workflows/freebsd.yml/badge.svg?branch=master)](https://github.com/rapidcow/siteconf-build/actions/workflows/freebsd.yml?query=branch%3Amaster)
@@ -24,7 +24,7 @@ offline. [Build dependencies](.github/workflows/)
 
 ## Run on GitHub
 
-Separate workflows test the same seven packages on Ubuntu 24.04, macOS 15, Alpine
+Separate workflows test the same seven packages on Ubuntu 24.04, macOS 15 (Intel), Alpine
 Linux 3.23, rolling Arch Linux, FreeBSD, NetBSD, and Solaris. Alpine and Arch each run inside their
 own distribution’s container on an Ubuntu runner. The BSD and Solaris jobs boot guest VMs and cache their installed dependencies.
 Click a platform’s badge to see its runs.
