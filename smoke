@@ -1,0 +1,25 @@
+#!/bin/sh
+set -eu
+
+engine=${1:-../siteconf}
+work=$(mktemp -d)
+work=$(cd "$work" && pwd)
+trap 'rm -rf "$work"' EXIT
+trap 'exit 1' HUP INT TERM
+
+revision=$(git -C "$engine" rev-parse HEAD)
+echo "Testing siteconf $revision"
+git -C "$engine" archive --format=tar "$revision" > "$work/source.tar"
+tar -xf "$work/source.tar" -C "$work"
+
+for package in codesets textdomain gengenlib genlib template-provider siteconf-l10n siteconf
+do
+    echo "Testing $package"
+    cd "$work/$package"
+    set --
+    if [ "$package" = siteconf-l10n ]; then
+        set -- 'LINGUAS=en zh'
+    fi
+    ../env.pl perl Makefile.PL "$@"
+    ../env.pl make test
+done
