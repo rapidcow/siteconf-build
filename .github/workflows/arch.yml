@@ -1,0 +1,40 @@
+name: Arch Linux
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '23 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      siteconf_ref:
+        description: Branch, tag or commit in rapidcow/siteconf
+        default: master
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: rapidcow/siteconf
+          ref: ${{ inputs.siteconf_ref || 'master' }}
+          path: upstream
+          persist-credentials: false
+      - name: Run package tests on Arch Linux
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/src:ro" -w /src archlinux:base sh -ec '
+            pacman -Syu --noconfirm --needed git base-devel ninja gettext perl-file-which perl-libintl-perl \
+              perl-uri perl-file-sharedir perl-file-sharedir-install perl-encode-locale perl-template-toolkit
+            git config --global --add safe.directory /src/upstream
+            ninja --version
+            ./smoke upstream
+          '

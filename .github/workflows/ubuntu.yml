@@ -1,0 +1,41 @@
+name: Ubuntu
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '23 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      siteconf_ref:
+        description: Branch, tag or commit in rapidcow/siteconf
+        default: master
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: rapidcow/siteconf
+          ref: ${{ inputs.siteconf_ref || 'master' }}
+          path: upstream
+          persist-credentials: false
+      - name: Install Ubuntu dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential ninja-build cpanminus gettext libfile-which-perl \
+            libintl-perl liburi-perl libfile-sharedir-perl libfile-sharedir-install-perl libencode-locale-perl
+          sudo cpanm --mirror https://cpan.metacpan.org --mirror-only 'Template~3.103'
+      - name: Run package tests
+        run: |
+          ninja --version
+          ./smoke upstream

@@ -1,0 +1,41 @@
+name: Alpine
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '23 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      siteconf_ref:
+        description: Branch, tag or commit in rapidcow/siteconf
+        default: master
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: rapidcow/siteconf
+          ref: ${{ inputs.siteconf_ref || 'master' }}
+          path: upstream
+          persist-credentials: false
+      - name: Run package tests on Alpine
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/src:ro" -w /src alpine:3.23 sh -ec '
+            apk add --no-cache git build-base ninja-is-really-ninja perl-dev gettext gettext-dev curl perl-app-cpanminus
+            cpanm --mirror https://cpan.metacpan.org --mirror-only File::Which Locale::Messages URI \
+              File::ShareDir File::ShareDir::Install Encode::Locale "Template~3.103"
+            git config --global --add safe.directory /src/upstream
+            ninja --version
+            ./smoke upstream
+          '
