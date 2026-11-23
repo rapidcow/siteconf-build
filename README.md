@@ -4,6 +4,9 @@
 [![macOS](https://github.com/rapidcow/siteconf-build/actions/workflows/macos.yml/badge.svg?branch=master)](https://github.com/rapidcow/siteconf-build/actions/workflows/macos.yml?query=branch%3Amaster)
 [![Alpine](https://github.com/rapidcow/siteconf-build/actions/workflows/alpine.yml/badge.svg?branch=master)](https://github.com/rapidcow/siteconf-build/actions/workflows/alpine.yml?query=branch%3Amaster)
 [![Arch Linux](https://github.com/rapidcow/siteconf-build/actions/workflows/arch.yml/badge.svg?branch=master)](https://github.com/rapidcow/siteconf-build/actions/workflows/arch.yml?query=branch%3Amaster)
+[![FreeBSD](https://github.com/rapidcow/siteconf-build/actions/workflows/freebsd.yml/badge.svg?branch=master)](https://github.com/rapidcow/siteconf-build/actions/workflows/freebsd.yml?query=branch%3Amaster)
+[![NetBSD](https://github.com/rapidcow/siteconf-build/actions/workflows/netbsd.yml/badge.svg?branch=master)](https://github.com/rapidcow/siteconf-build/actions/workflows/netbsd.yml?query=branch%3Amaster)
+[![Solaris](https://github.com/rapidcow/siteconf-build/actions/workflows/solaris.yml/badge.svg?branch=master)](https://github.com/rapidcow/siteconf-build/actions/workflows/solaris.yml?query=branch%3Amaster)
 
 Run `make test` for all seven Perl packages in siteconf.
 
@@ -22,8 +25,9 @@ offline. [Build dependencies](.github/workflows/)
 ## Run on GitHub
 
 Separate workflows test the same seven packages on Ubuntu 24.04, macOS 15, Alpine
-Linux 3.23, and rolling Arch Linux. Alpine and Arch each run inside their
-own distribution’s container on an Ubuntu runner. Click a platform’s badge to see its runs.
+Linux 3.23, rolling Arch Linux, FreeBSD, NetBSD, and Solaris. Alpine and Arch each run inside their
+own distribution’s container on an Ubuntu runner. The BSD and Solaris jobs boot guest VMs and cache their installed dependencies.
+Click a platform’s badge to see its runs.
 
 Pushes and pull requests here test upstream `master`. A weekly run on Monday
 at 06:23 UTC picks up changes made in the separate siteconf repository.

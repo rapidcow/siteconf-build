@@ -1,0 +1,51 @@
+name: Solaris
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '23 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      siteconf_ref:
+        description: Branch, tag or commit in rapidcow/siteconf
+        default: master
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: rapidcow/siteconf
+          ref: ${{ inputs.siteconf_ref || 'master' }}
+          path: upstream
+          persist-credentials: false
+      - name: Run package tests on Solaris
+        uses: vmactions/solaris-vm@v1
+        with:
+          release: "11.4-gcc"
+          cache-after-prepare: true
+          copyback: false
+          prepare: |
+            set -eu
+            export PATH="/usr/gnu/bin:/usr/sfw/bin:/usr/ccs/bin:$PATH"
+            # IPS returns 4 when all requested packages are already installed.
+            pkg install developer/versioning/git developer/build/gnu-make developer/build/ninja \
+              runtime/perl-538 text/gnu-gettext archiver/gnu-tar web/curl || [ "$?" -eq 4 ]
+            curl -fsSL https://cpanmin.us/ -o /tmp/cpanm
+            perl /tmp/cpanm --mirror https://cpan.metacpan.org --mirror-only File::Which Locale::Messages URI File::ShareDir File::ShareDir::Install Encode::Locale 'Template~3.103'
+          run: |
+            set -eu
+            export PATH="/usr/gnu/bin:/usr/sfw/bin:/usr/ccs/bin:$PATH"
+            git config --global --add safe.directory "$PWD/upstream"
+            ninja --version
+            ./smoke upstream
