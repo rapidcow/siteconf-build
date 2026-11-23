@@ -1,5 +1,7 @@
 # siteconf-build
 
+[![siteconf smoke test](https://github.com/rapidcow/siteconf-build/actions/workflows/smoke.yml/badge.svg?branch=master)](https://github.com/rapidcow/siteconf-build/actions/workflows/smoke.yml?query=branch%3Amaster)
+
 Run `make test` for all seven Perl packages in siteconf.
 
 ## Run locally
@@ -9,28 +11,16 @@ to another clone with `./smoke /path/to/siteconf`. The script extracts that
 commit into a temporary directory and uses siteconf’s `env.pl` to load the
 packages built there. It exits on the first failure.
 
-You need Git, tar, make, Perl and gettext. The workflow lists the Ubuntu
-packages and Perl dependencies. Once those are available, the test runs
+You need Git, tar, make, Perl and gettext. The workflow lists the system and
+Perl dependencies for each platform. Once those are available, the test runs
 offline. [Build dependencies](.github/workflows/smoke.yml)
 
 ## Run on GitHub
 
-1. Create an empty GitHub repository for this harness. A public repository
-   can run this workflow's standard Ubuntu runner for free. Private repositories
-   draw on the account's included usage. [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions)
-2. From this directory, run the commands below, replacing OWNER and REPO
-   with the repository you created.
-
-   ```sh
-   git add README.md AGENTS.md smoke .github/workflows/smoke.yml
-   git commit -m "Add siteconf smoke build"
-   git remote add origin https://github.com/OWNER/REPO.git
-   git push -u origin HEAD
-   ```
-
-3. Open **Actions → siteconf smoke test** and select the first run to see
-   the build log. If Actions is disabled for the repository, enable it and
-   use **Run workflow** on the default branch.
+Each run tests the same seven packages on Ubuntu 24.04, macOS 15, Alpine
+Linux 3.23, and rolling Arch Linux. Alpine and Arch each run inside their
+own distribution’s container on an Ubuntu runner. Click the badge above
+to see the result for each platform.
 
 Pushes and pull requests here test upstream `master`. A weekly run on Monday
 at 06:23 UTC picks up changes made in the separate siteconf repository.

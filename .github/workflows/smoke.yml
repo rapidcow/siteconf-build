@@ -17,7 +17,20 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    name: ${{ matrix.platform }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: Ubuntu
+            runner: ubuntu-24.04
+          - platform: macOS
+            runner: macos-15
+          - platform: Alpine
+            runner: ubuntu-24.04
+          - platform: Arch
+            runner: ubuntu-24.04
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -29,11 +42,43 @@ jobs:
           ref: ${{ inputs.siteconf_ref || 'master' }}
           path: upstream
           persist-credentials: false
-      - name: Install build dependencies
+      - name: Install Ubuntu dependencies
+        if: matrix.platform == 'Ubuntu'
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cpanminus gettext libfile-which-perl \
             libintl-perl liburi-perl libfile-sharedir-perl libfile-sharedir-install-perl libencode-locale-perl
           sudo cpanm --mirror https://cpan.metacpan.org --mirror-only 'Template~3.103'
+      - name: Install macOS dependencies
+        if: matrix.platform == 'macOS'
+        run: |
+          brew install perl cpanminus gettext
+          export PATH="$(brew --prefix perl)/bin:$(brew --prefix gettext)/bin:$PATH"
+          modules="$RUNNER_TEMP/perl5"
+          perl "$(command -v cpanm)" --local-lib "$modules" --mirror https://cpan.metacpan.org --mirror-only \
+            File::Which Locale::Messages URI File::ShareDir File::ShareDir::Install Encode::Locale 'Template~3.103'
+          echo "$(brew --prefix perl)/bin" >> "$GITHUB_PATH"
+          echo "$(brew --prefix gettext)/bin" >> "$GITHUB_PATH"
+          echo "PERL5LIB=$modules/lib/perl5" >> "$GITHUB_ENV"
       - name: Run package tests
+        if: matrix.platform == 'Ubuntu' || matrix.platform == 'macOS'
         run: ./smoke upstream
+      - name: Run package tests on Alpine
+        if: matrix.platform == 'Alpine'
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/src:ro" -w /src alpine:3.23 sh -ec '
+            apk add --no-cache git build-base perl-dev gettext gettext-dev curl perl-app-cpanminus
+            cpanm --mirror https://cpan.metacpan.org --mirror-only File::Which Locale::Messages URI \
+              File::ShareDir File::ShareDir::Install Encode::Locale "Template~3.103"
+            git config --global --add safe.directory /src/upstream
+            ./smoke upstream
+          '
+      - name: Run package tests on Arch Linux
+        if: matrix.platform == 'Arch'
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/src:ro" -w /src archlinux:base sh -ec '
+            pacman -Syu --noconfirm --needed git base-devel gettext perl-file-which perl-libintl-perl \
+              perl-uri perl-file-sharedir perl-file-sharedir-install perl-encode-locale perl-template-toolkit
+            git config --global --add safe.directory /src/upstream
+            ./smoke upstream
+          '
