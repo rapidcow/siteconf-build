@@ -4,7 +4,14 @@ set -eu
 engine=${1:-../siteconf}
 work=$(mktemp -d)
 work=$(cd "$work" && pwd)
-trap 'rm -rf "$work"' EXIT
+cleanup() {
+    if ! rm -rf "$work"; then
+        echo "Cleanup failed; remaining paths in $work:" >&2
+        find "$work" -print >&2
+        exit 1
+    fi
+}
+trap cleanup EXIT
 trap 'exit 1' HUP INT TERM
 
 revision=$(git -C "$engine" rev-parse HEAD)
@@ -13,7 +20,7 @@ git -C "$engine" archive --format=tar "$revision" > "$work/source.tar"
 tar -xf "$work/source.tar" -C "$work"
 
 for package in codesets textdomain gengenlib genlib template-provider siteconf-l10n siteconf
-do
+do (
     echo "Testing $package"
     cd "$work/$package"
     set --
@@ -22,4 +29,5 @@ do
     fi
     ../env.pl perl Makefile.PL "$@"
     ../env.pl make test
+)
 done
