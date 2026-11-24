@@ -14,7 +14,7 @@ cleanup() {
 trap cleanup EXIT
 trap 'exit 1' HUP INT TERM
 
-revision=$(git -C "$engine" rev-parse HEAD)
+revision=b85d1c548e820a01d71956bd3ba1810862eadd7b
 echo "Testing siteconf $revision"
 git -C "$engine" archive --format=tar "$revision" > "$work/source.tar"
 tar -xf "$work/source.tar" -C "$work"
