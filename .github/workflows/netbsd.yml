@@ -9,7 +9,7 @@ on:
     inputs:
       siteconf_ref:
         description: Branch, tag or commit in rapidcow/siteconf
-        default: master
+        default: 98222e3e1e6dded286f0854609815167c2f50463
         required: true
 
 permissions:
@@ -26,7 +26,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: rapidcow/siteconf
-          ref: ${{ inputs.siteconf_ref || 'master' }}
+          ref: ${{ inputs.siteconf_ref || '98222e3e1e6dded286f0854609815167c2f50463' }}
           path: upstream
           persist-credentials: false
       - name: Run package tests on NetBSD

@@ -29,9 +29,9 @@ Linux 3.23, rolling Arch Linux, FreeBSD, NetBSD, and Solaris. Alpine and Arch ea
 own distribution’s container on an Ubuntu runner. The BSD and Solaris jobs boot guest VMs and cache their installed dependencies.
 Click a platform’s badge to see its runs.
 
-Pushes and pull requests here test upstream `master`. A weekly run on Monday
-at 06:23 UTC picks up changes made in the separate siteconf repository.
-For an earlier result, use **Run workflow** and enter a branch, tag or commit
+Pushes, pull requests, and the weekly Monday run at 06:23 UTC test siteconf
+commit `98222e3e1e6dded286f0854609815167c2f50463`.
+To test another revision, use **Run workflow** and enter a branch, tag or commit
 from rapidcow/siteconf that contains the seven package directories.
 The job needs only read access and uses no deployment credentials.
 
